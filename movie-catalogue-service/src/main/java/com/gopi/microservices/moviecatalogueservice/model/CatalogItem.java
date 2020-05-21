@@ -1,40 +1,56 @@
+/**
+ * Created by gopinath_mb on 21-May-2020
+ */
 package com.gopi.microservices.moviecatalogueservice.model;
 
-public class CatalogItem {
+/**
+ * @author gopinath_mb
+ */
+public class CatalogItem
+{
 
-	private String name;
-	private String desc;
-	private int rating;
+  private String name;
 
-	public CatalogItem(String name, String desc, int rating) {
-		super();
-		this.name = name;
-		this.desc = desc;
-		this.rating = rating;
-	}
+  private String desc;
 
-	public String getName() {
-		return name;
-	}
+  private int rating;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public CatalogItem(String name, String desc, int rating)
+  {
+    super();
+    this.name = name;
+    this.desc = desc;
+    this.rating = rating;
+  }
 
-	public String getDesc() {
-		return desc;
-	}
+  public String getName()
+  {
+    return name;
+  }
 
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
+  public void setName(String name)
+  {
+    this.name = name;
+  }
 
-	public int getRating() {
-		return rating;
-	}
+  public String getDesc()
+  {
+    return desc;
+  }
 
-	public void setRating(int rating) {
-		this.rating = rating;
-	}
+  public void setDesc(String desc)
+  {
+    this.desc = desc;
+  }
+
+  public int getRating()
+  {
+    return rating;
+  }
+
+  public void setRating(int rating)
+  {
+    this.rating = rating;
+  }
 
 }
