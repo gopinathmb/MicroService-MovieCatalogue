@@ -1,23 +1,23 @@
 /**
  * Created by gopinath_mb on 21-May-2020
  */
-package com.gopi.microservices.movieinfoservice.model;
+package com.gopi.microservices.moviecatalogueservice.model;
 
 /**
  * @author gopinath_mb
  */
-public class Movie
+public class Rating
 {
+
   private String movieId;
 
-  private String name;
+  private int rating;
 
-  
-  public Movie(String movieId, String name)
+  public Rating(String movieId, int rating)
   {
     super();
     this.movieId = movieId;
-    this.name = name;
+    this.rating = rating;
   }
 
   public String getMovieId()
@@ -30,14 +30,14 @@ public class Movie
     this.movieId = movieId;
   }
 
-  public String getName()
+  public int getRating()
   {
-    return name;
+    return rating;
   }
 
-  public void setName(String name)
+  public void setRating(int rating)
   {
-    this.name = name;
+    this.rating = rating;
   }
 
 }
