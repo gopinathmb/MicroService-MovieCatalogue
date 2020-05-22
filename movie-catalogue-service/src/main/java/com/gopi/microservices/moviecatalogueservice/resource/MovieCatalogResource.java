@@ -21,6 +21,7 @@ import com.gopi.microservices.moviecatalogueservice.model.CatalogItem;
 import com.gopi.microservices.moviecatalogueservice.model.Movie;
 import com.gopi.microservices.moviecatalogueservice.model.Rating;
 import com.gopi.microservices.moviecatalogueservice.model.UserRating;
+import com.netflix.discovery.DiscoveryClient;
 
 /**
  * @author gopinath_mb
@@ -31,25 +32,33 @@ import com.gopi.microservices.moviecatalogueservice.model.UserRating;
 public class MovieCatalogResource
 {
   @Autowired
-  private RestTemplate resrTemplate;
+  private RestTemplate restTemplate;
 
   @Autowired
   private WebClient.Builder webClientBuilder;
+
+  @Autowired // You can check all the instances available and can use in ur
+             // application.But it is not recomended as it is automatically
+             // taken care.
+  private DiscoveryClient discoveryClient;
 
   @RequestMapping("/{userId}") // Equivalent to "/catalog/{userIs}"
   public List<CatalogItem> getCatalog(@PathVariable String userId)
   {
 
-    UserRating userRating = resrTemplate.getForObject(
-        "http://localhost:8083/ratingsData/users/" + userId, UserRating.class);
-    List<CatalogItem> collect = userRating.getUserRating().stream().map(rating -> {
-      // This is using RestTemplate
-      Movie movie = resrTemplate.getForObject(
-          "http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
+    UserRating userRating = restTemplate.getForObject(
+        "http://ratings-data-service/ratingsData/users/" + userId,
+        UserRating.class);
+    List<CatalogItem> collect = userRating.getUserRating().stream()
+        .map(rating -> {
+          // This is using RestTemplate
+          Movie movie = restTemplate.getForObject(
+              "http://movie-info-service/movies/" + rating.getMovieId(),
+              Movie.class);
 
-      return new CatalogItem(movie.getName(), "Default movie description",
-          rating.getRating());
-    }).collect(Collectors.toList());
+          return new CatalogItem(movie.getName(), "Default movie description",
+              rating.getRating());
+        }).collect(Collectors.toList());
     return collect;
 
     // This is using WebClient
