@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.gopi.microservices.moviecatalogueservice.model.CatalogItem;
 import com.gopi.microservices.moviecatalogueservice.model.Movie;
 import com.gopi.microservices.moviecatalogueservice.model.Rating;
+import com.gopi.microservices.moviecatalogueservice.model.UserRating;
 
 /**
  * @author gopinath_mb
@@ -39,26 +40,27 @@ public class MovieCatalogResource
   public List<CatalogItem> getCatalog(@PathVariable String userId)
   {
 
-    List<Rating> ratings = Arrays.asList(new Rating("123", 4),
-        new Rating("456", 3));
-    List<CatalogItem> collect = ratings.stream().map(rating -> {
+    UserRating userRating = resrTemplate.getForObject(
+        "http://localhost:8083/ratingsData/users/" + userId, UserRating.class);
+    List<CatalogItem> collect = userRating.getUserRating().stream().map(rating -> {
       // This is using RestTemplate
       Movie movie = resrTemplate.getForObject(
           "http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
 
-      // This is using WebClient
-       /* Movie movie = webClientBuilder.build().get() // Request type
-          .uri("http://localhost:8082/movies/"+rating.getMovieId()) // Which uri
-          .retrieve() // fetch the data from above uri
-          .bodyToMono(Movie.class) // Convert body to Movie.class instance. Mono
-                                   // means just a promise and will populate
-                                   // soon
-                                   // asynchronously.
-          .block(); // block until it is generated. So it is synchronous.
-          */
       return new CatalogItem(movie.getName(), "Default movie description",
           rating.getRating());
     }).collect(Collectors.toList());
     return collect;
+
+    // This is using WebClient
+//     Movie movie = webClientBuilder.build().get() // Request type
+//       .uri("http://localhost:8082/movies/"+rating.getMovieId()) // Which uri
+//       .retrieve() // fetch the data from above uri
+//       .bodyToMono(Movie.class) // Convert body to Movie.class instance. Mono
+//                                // means just a promise and will populate
+//                                // soon
+//                                // asynchronously.
+//       .block(); // block until it is generated. So it is synchronous.
+
   }
 }
