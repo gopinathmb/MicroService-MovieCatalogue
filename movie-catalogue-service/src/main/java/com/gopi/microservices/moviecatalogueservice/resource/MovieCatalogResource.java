@@ -37,10 +37,10 @@ public class MovieCatalogResource
   @Autowired
   private WebClient.Builder webClientBuilder;
 
-  @Autowired // You can check all the instances available and can use in ur
+//  @Autowired // You can check all the instances available and can use in ur
              // application.But it is not recomended as it is automatically
              // taken care.
-  private DiscoveryClient discoveryClient;
+//  private DiscoveryClient discoveryClient;
 
   @RequestMapping("/{userId}") // Equivalent to "/catalog/{userIs}"
   public List<CatalogItem> getCatalog(@PathVariable String userId)
@@ -56,7 +56,7 @@ public class MovieCatalogResource
               "http://movie-info-service/movies/" + rating.getMovieId(),
               Movie.class);
 
-          return new CatalogItem(movie.getName(), "Default movie description",
+          return new CatalogItem(movie.getName(), movie.getDesc(),
               rating.getRating());
         }).collect(Collectors.toList());
     return collect;
