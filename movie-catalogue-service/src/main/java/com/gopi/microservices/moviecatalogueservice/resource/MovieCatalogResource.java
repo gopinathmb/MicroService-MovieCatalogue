@@ -4,13 +4,10 @@
 package com.gopi.microservices.moviecatalogueservice.resource;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.amqp.RabbitProperties.Template;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +18,9 @@ import com.gopi.microservices.moviecatalogueservice.model.CatalogItem;
 import com.gopi.microservices.moviecatalogueservice.model.Movie;
 import com.gopi.microservices.moviecatalogueservice.model.Rating;
 import com.gopi.microservices.moviecatalogueservice.model.UserRating;
-import com.netflix.discovery.DiscoveryClient;
+import com.gopi.microservices.moviecatalogueservice.service.MovieInfo;
+import com.gopi.microservices.moviecatalogueservice.service.UserRatingInfo;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 /**
  * @author gopinath_mb
@@ -37,24 +36,27 @@ public class MovieCatalogResource
   @Autowired
   private WebClient.Builder webClientBuilder;
 
+  @Autowired
+  MovieInfo movieInfo;
+
+  @Autowired
+  UserRatingInfo userRatingInfo;
+
 //  @Autowired // You can check all the instances available and can use in ur
-             // application.But it is not recomended as it is automatically
-             // taken care.
+  // application.But it is not recomended as it is automatically
+  // taken care.
 //  private DiscoveryClient discoveryClient;
 
   @RequestMapping("/{userId}") // Equivalent to "/catalog/{userIs}"
+//  @HystrixCommand(fallbackMethod = "getFallbackCatalog")
   public List<CatalogItem> getCatalog(@PathVariable String userId)
   {
 
-    UserRating userRating = restTemplate.getForObject(
-        "http://ratings-data-service/ratingsData/users/" + userId,
-        UserRating.class);
+    UserRating userRating = userRatingInfo.getRatingInfo(userId);
     List<CatalogItem> collect = userRating.getUserRating().stream()
         .map(rating -> {
           // This is using RestTemplate
-          Movie movie = restTemplate.getForObject(
-              "http://movie-info-service/movies/" + rating.getMovieId(),
-              Movie.class);
+          Movie movie = movieInfo.getMovieInfo(rating);
 
           return new CatalogItem(movie.getName(), movie.getDesc(),
               rating.getRating());
@@ -71,5 +73,11 @@ public class MovieCatalogResource
 //                                // asynchronously.
 //       .block(); // block until it is generated. So it is synchronous.
 
+  }
+
+  public List<CatalogItem> getFallbackCatalog(@PathVariable String userId)
+  {
+    return Arrays.asList(new CatalogItem("FallBack Movie Name",
+        "Fallback movie description", 4));
   }
 }
